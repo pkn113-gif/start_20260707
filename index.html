@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🌼 쉬는시간 타이머 🌼</title>
+
+<style>
+body{
+margin:0;
+font-family:'Comic Sans MS','맑은 고딕';
+background:#dff6ff;
+overflow:hidden;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+body::before{
+content:"";
+position:absolute;
+inset:0;
+background:
+radial-gradient(circle at 20% 20%,#fff 0 35px,transparent 36px),
+radial-gradient(circle at 80% 25%,#fff 0 45px,transparent 46px),
+linear-gradient(#bde8ff,#dff6ff);
+opacity:.8;
+}
+
+.container{
+position:relative;
+z-index:2;
+background:#fffdf8;
+padding:30px;
+border-radius:30px;
+box-shadow:0 8px 25px rgba(0,0,0,.15);
+text-align:center;
+width:360px;
+border:6px dashed #ffd166;
+}
+
+h1{
+margin-top:0;
+color:#ff6fa5;
+}
+
+#time{
+font-size:70px;
+font-weight:bold;
+color:#5b4b8a;
+margin:20px;
+text-shadow:3px 3px #ffe082;
+}
+
+button{
+width:90px;
+height:90px;
+margin:8px;
+border:none;
+cursor:pointer;
+font-size:15px;
+font-weight:bold;
+background:#ffd6e7;
+clip-path:polygon(
+50% 0%,65% 20%,90% 15%,80% 40%,
+100% 50%,80% 60%,90% 85%,65% 80%,
+50% 100%,35% 80%,10% 85%,20% 60%,
+0% 50%,20% 40%,10% 15%,35% 20%);
+transition:.2s;
+box-shadow:0 4px 8px rgba(0,0,0,.2);
+}
+
+button:hover{
+transform:scale(1.08);
+}
+
+input{
+width:70px;
+font-size:22px;
+text-align:center;
+border-radius:10px;
+border:2px solid #ccc;
+padding:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🌼 쉬는시간 타이머 🌼</h1>
+
+<input id="min" type="number" value="10" min="0"> 분
+
+<div id="time">10:00</div>
+
+<button onclick="start()">시작</button>
+<button onclick="pause()">멈춤</button>
+<button onclick="reset()">초기화</button>
+<br>
+<button style="width:180px;background:#c8f7c5;" onclick="breakTime()">🌼쉬는시간 10분🌼</button>
+
+</div>
+
+<script>
+
+let timer;
+let remain=600;
+
+function draw(){
+let m=Math.floor(remain/60);
+let s=remain%60;
+time.innerHTML=
+String(m).padStart(2,"0")+":"+
+String(s).padStart(2,"0");
+}
+
+draw();
+
+function start(){
+
+clearInterval(timer);
+
+if(remain<=0)
+remain=Number(min.value)*60;
+
+timer=setInterval(()=>{
+
+remain--;
+
+draw();
+
+if(remain<=0){
+
+clearInterval(timer);
+
+schoolBell();
+
+alert("🎉 쉬는시간입니다!");
+
+}
+
+},1000);
+
+}
+
+function pause(){
+
+clearInterval(timer);
+
+}
+
+function reset(){
+
+clearInterval(timer);
+
+remain=Number(min.value)*60;
+
+draw();
+
+}
+
+function breakTime(){
+
+min.value=10;
+
+remain=600;
+
+draw();
+
+start();
+
+}
+
+function schoolBell(){
+
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+
+const notes=[784,659,523,659,784];
+
+notes.forEach((f,i)=>{
+
+setTimeout(()=>{
+
+const osc=ctx.createOscillator();
+
+const gain=ctx.createGain();
+
+osc.frequency.value=f;
+osc.type="triangle";
+
+osc.connect(gain);
+gain.connect(ctx.destination);
+
+gain.gain.setValueAtTime(.2,ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.6);
+
+osc.start();
+osc.stop(ctx.currentTime+.6);
+
+},i*350);
+
+});
+
+}
+
+min.oninput=()=>{
+
+remain=Number(min.value)*60;
+
+draw();
+
+}
+
+</script>
+
+</body>
+</html>
